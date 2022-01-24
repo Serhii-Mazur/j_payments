@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 public class DatabaseConfig {
+    private final String dbType;
+    private final String dbSchema;
     private final String user;
     private final String password;
     private final String url;
@@ -21,14 +23,23 @@ public class DatabaseConfig {
         } catch (IOException e) {
             e.printStackTrace();    // TODO: modify this block
         }
+        this.dbType = dbProperties.getProperty("dbtype");
+        this.dbSchema = dbProperties.getProperty("dbschema");
         this.user = dbProperties.getProperty("user");
         this.password = dbProperties.getProperty("password");
         this.url =
-                "jdbc:" +
-                        dbProperties.getProperty("dbtype") + "://" +
+                "jdbc:" + dbType + "://" +
                         dbProperties.getProperty("dbhost") + ":" +
                         dbProperties.getProperty("dbport") + "/" +
                         dbProperties.getProperty("dbname");
+    }
+
+    public String getDbType() {
+        return dbType;
+    }
+
+    public String getDbSchema() {
+        return dbSchema;
     }
 
     public String getUser() {

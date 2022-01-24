@@ -1,4 +1,4 @@
-package application;
+package application.constants;
 
 public enum PaymentStatus {
     NEW,
