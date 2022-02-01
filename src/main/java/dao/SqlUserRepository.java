@@ -3,39 +3,43 @@ package dao;
 import application.domain.User;
 import application.port.UserRepository;
 
-import javax.validation.constraints.NotNull;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
 public class SqlUserRepository implements UserRepository {
+    private final Connection dbConnection;
+
+    public SqlUserRepository(Connection dbConnection) {
+        this.dbConnection = dbConnection;
+    }
+
     @Override
     public List<User> getUsers() {
         return null;
     }
 
     @Override
-    public boolean addUser(@NotNull User user) {
+    public boolean addUser(User user) {
 
-        String user_id = user.getUserID().toString();
+        String id = user.getUserID().toString();
         String full_name = user.getFullName();
-        String email = user.geteMail();
+        String email = user.getEmail();
         String phone_number = user.getPhoneNumber();
 
-        String ADD_USER_QUERY = String.format("INSERT INTO mono_test_project.users (user_id, full_name, email, phone_number) " +
-                "VALUES ('%s', '%s', '%s', '%s');", user_id, full_name, email, phone_number);
-        System.out.println(ADD_USER_QUERY);
+        String ADD_USER_QUERY = String.format("INSERT INTO mono.users (id, full_name, email, phone_number) " +
+                "VALUES ('%s', '%s', '%s', '%s');", id, full_name, email, phone_number);
+
         boolean result;
 
         try (
-                Connection dbConnection = DatabaseConnector.getDbConnection(new DatabaseConfig());
-                Statement stmt = dbConnection.createStatement();
+                Statement stmt = dbConnection.createStatement()
         ) {
             stmt.executeUpdate(ADD_USER_QUERY);
             result = true;
 
-        } catch (SQLException | ClassNotFoundException exception) {
+        } catch (SQLException exception) {
             exception.printStackTrace();
             result = false;
         }
