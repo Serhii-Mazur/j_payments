@@ -5,12 +5,12 @@ import java.util.UUID;
 public class Address {
     private UUID addressID;
     private String address;
-    private UUID userID;
+    private String userEmail;
 
-    public Address(String address, UUID userID) {
+    public Address(String address, String userEmail) {
         this.address = address;
-        this.userID = userID;
-        this.addressID = UUID.fromString(address + userID);
+        this.userEmail = userEmail;
+        this.addressID = UUID.randomUUID();
     }
 
     public UUID getAddressID() {
@@ -29,11 +29,11 @@ public class Address {
         this.address = address;
     }
 
-    public UUID getUserID() {
-        return userID;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setUserID(UUID userID) {
-        this.userID = userID;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 }

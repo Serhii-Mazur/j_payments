@@ -22,14 +22,13 @@ public class SqlUserRepository implements UserRepository {
 
     @Override
     public boolean addUser(User user) {
-
-        String id = user.getUserID().toString();
+//        String id = user.getUserID().toString();
         String full_name = user.getFullName();
         String email = user.getEmail();
         String phone_number = user.getPhoneNumber();
 
-        String ADD_USER_QUERY = String.format("INSERT INTO mono.users (id, full_name, email, phone_number) " +
-                "VALUES ('%s', '%s', '%s', '%s');", id, full_name, email, phone_number);
+        String ADD_USER_QUERY = String.format("INSERT INTO mono.users (full_name, email, phone_number) " +
+                "VALUES ('%s', '%s', '%s');", full_name, email, phone_number);
 
         boolean result;
 

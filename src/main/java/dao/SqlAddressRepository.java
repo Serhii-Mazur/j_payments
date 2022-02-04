@@ -23,23 +23,23 @@ public class SqlAddressRepository implements AddressRepository {
 
     @Override
     public boolean addAddress(Address paymentAddress) {
-        String user_id = paymentAddress.getUserID().toString();
+        String user_email = paymentAddress.getUserEmail();
         String address = paymentAddress.getAddress();
         String id = paymentAddress.getAddressID().toString();
 
-        String ADD_ADDRESS_QUERY = String.format("INSERT INTO mono.addresses (id, address, user_id) " +
-                "VALUES ('%s', '%s', '%s');", id, address, user_id);
+        String ADD_ADDRESS_QUERY = String.format("INSERT INTO mono.addresses (id, address, user_email) " +
+                "VALUES ('%s', '%s', '%s');", id, address, user_email);
 
         boolean result;
 
         try (
-                Statement stmt = dbConnection.createStatement();
+                Statement stmt = dbConnection.createStatement()
         ) {
             stmt.executeUpdate(ADD_ADDRESS_QUERY);
             result = true;
 
-        } catch (SQLException exception) {
-            exception.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
             result = false;
         }
         return result;

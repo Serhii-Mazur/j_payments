@@ -1,9 +1,16 @@
 package api;
 
+import application.constants.ScriptCommands;
+import application.service.AddressService;
+import application.service.TemplateService;
+import application.service.UserService;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ScriptInterpreter {
     //    AbsPath -> G:\MONO_IT_School\payments\src\main\resources\config.application.properties
@@ -13,24 +20,30 @@ public class ScriptInterpreter {
             "src\\main\\resources").toAbsolutePath().toString();
     private final String configFileName = "config.application.properties";
 
-    public void execute() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(getScriptFile()))) {
-            reader.lines();
-            String line = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private final UserService userService;
+    private final AddressService addressService;
+    private final TemplateService templateService;
 
-        try (InputStream inputStream = new BufferedInputStream(new FileInputStream(getScriptFile()))) {
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+    public ScriptInterpreter(
+            UserService userService,
+            AddressService addressService,
+            TemplateService templateService
+    ) {
+        this.userService = userService;
+        this.addressService = addressService;
+        this.templateService = templateService;
     }
 
-    public boolean readLine() {
-        return false;
+    public void execute() throws IOException {
+        for (String line : getScriptLines(getScriptFile())) {
+            String command = line.substring(0, line.indexOf(':'));
+            String data = line.substring(line.indexOf(':') + 1);
+            for (ScriptCommands permittedCommand : ScriptCommands.values()) {
+                if (command.equals(permittedCommand.name())) {
+                    executeCommand(command, data);
+                }
+            }
+        }
     }
 
     private File getScriptFile() throws IOException {
@@ -45,5 +58,47 @@ public class ScriptInterpreter {
             throw new IOException(String.format("File %s does not exists!", scriptFile.getName()));
         }
         return scriptFile;
+    }
+
+    private List<String> getScriptLines(File scriptFile) {
+        List<String> scriptLines;
+        try (
+                BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
+                Stream<String> lineStream = reader.lines()
+        ) {
+            scriptLines = Collections.unmodifiableList(lineStream.collect(Collectors.toList()));
+//            scriptLines = lineStream.collect(Collectors.toList());
+        } catch (IOException e) {
+            scriptLines = Collections.emptyList();
+        }
+        return scriptLines;
+    }
+
+    private boolean executeCommand(String command, String data) {
+        boolean result = false;
+        switch (command) {
+            case "REG_USER":
+                String[] splittedUserData = data.split("\\|");
+                String fullName = splittedUserData[0];
+                String eMail = splittedUserData[1];
+                String phoneNumber = splittedUserData[2];
+                userService.addNewUser(fullName, eMail, phoneNumber);
+//                System.out.printf("%s, %s, %s", fullName, eMail, phoneNumber);
+                break;
+            case "ADD_ADDR":
+                String[] splittedAddressData = data.split("\\|");
+                String address = splittedAddressData[0];
+                String userEmail = splittedAddressData[1];
+                addressService.addNewAddress(address, userEmail);
+//                System.out.printf("%s, %s, %s", fullName, eMail, phoneNumber);
+                break;
+            case "ADD_TMPL":
+
+                break;
+            case "ADD_PMNT":
+
+                break;
+        }
+        return result;
     }
 }

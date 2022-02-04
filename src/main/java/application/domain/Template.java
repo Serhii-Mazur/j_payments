@@ -16,4 +16,40 @@ public class Template {
         this.iban = iban;
         this.templateID = UUID.fromString(paymentPurpose);
     }
+
+    public UUID getTemplateID() {
+        return templateID;
+    }
+
+    public UUID getAddressID() {
+        return addressID;
+    }
+
+    public void setAddressID(UUID addressID) {
+        this.addressID = addressID;
+    }
+
+    public String getPaymentPurpose() {
+        return paymentPurpose;
+    }
+
+    public void setPaymentPurpose(String paymentPurpose) {
+        this.paymentPurpose = paymentPurpose;
+    }
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
+    }
 }

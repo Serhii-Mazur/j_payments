@@ -12,7 +12,7 @@ public class DatabaseConfig {
     private final String password;
     private final String url;
 
-    public DatabaseConfig() {
+    public DatabaseConfig() throws ConfigDBException {
         final Properties dbProperties = new Properties();
         Path conf = Path.of(
                 System.getProperty("user.dir"),
@@ -21,7 +21,8 @@ public class DatabaseConfig {
         try {
             dbProperties.load(Files.newBufferedReader(conf));
         } catch (IOException e) {
-            e.printStackTrace();    // TODO: modify this block
+            throw new ConfigDBException("Can't load database properties. ", e);
+//            e.printStackTrace();    // TODO: modify this block
         }
         this.dbType = dbProperties.getProperty("dbtype");
         this.dbSchema = dbProperties.getProperty("dbschema");
@@ -52,5 +53,19 @@ public class DatabaseConfig {
 
     public String getUrl() {
         return url;
+    }
+
+    public class ConfigDBException extends Exception {
+        public ConfigDBException() {
+            super();
+        }
+
+        public ConfigDBException(String message) {
+            super(message);
+        }
+
+        public ConfigDBException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

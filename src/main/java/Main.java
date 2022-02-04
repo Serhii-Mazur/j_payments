@@ -1,20 +1,33 @@
-import application.domain.User;
-import dao.DatabaseConfig;
-import dao.DatabaseConnector;
-import dao.SqlAddressRepository;
-import dao.SqlUserRepository;
+import api.ScriptInterpreter;
+import application.service.AddressServiceImpl;
+import application.service.TemplateServiceImpl;
+import application.service.UserServiceImpl;
+import dao.*;
 
-import java.nio.file.Path;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
-        String srcDirPath = Path.of(
-                System.getProperty("user.dir"),
-                "src\\main\\resources",
-                "config.application.properties").toString();
-        System.out.println(srcDirPath);
+        try (Connection connection = DatabaseConnector.getDbConnection(new DatabaseConfig())) {
+            ScriptInterpreter interpreter = new ScriptInterpreter
+                    (
+                            new UserServiceImpl(new SqlUserRepository(connection)),
+                            new AddressServiceImpl(new SqlAddressRepository(connection)),
+                            new TemplateServiceImpl(new SqlTemplateRepository(connection))
+                    );
+            try {
+                interpreter.execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        } catch (DatabaseConfig.ConfigDBException e) {
+            e.printStackTrace();
+        }
+
         //        try (Connection connection = DatabaseConnector.getDbConnection(new DatabaseConfig())) {
 //            SqlUserRepository userRepository = new SqlUserRepository(connection);
 //            addUser(userRepository);

@@ -3,7 +3,7 @@ package application.domain;
 import java.util.UUID;
 
 public class User {
-    private UUID userID = UUID.randomUUID();
+//    private UUID userID = UUID.randomUUID();
     private String fullName;
     private String eMail;
     private String phoneNumber;
@@ -14,9 +14,9 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public UUID getUserID() {
-        return userID;
-    }
+//    public UUID getUserID() {
+//        return userID;
+//    }
 
     public String getFullName() {
         return fullName;
