@@ -14,7 +14,7 @@ public class Template {
         this.templateName = templateName;
         this.paymentPurpose = paymentPurpose;
         this.iban = iban;
-        this.templateID = UUID.fromString(paymentPurpose);
+        this.templateID = UUID.randomUUID();
     }
 
     public UUID getTemplateID() {

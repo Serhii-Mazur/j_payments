@@ -15,7 +15,7 @@ public class Main {
                     (
                             new UserServiceImpl(new SqlUserRepository(connection)),
                             new AddressServiceImpl(new SqlAddressRepository(connection)),
-                            new TemplateServiceImpl(new SqlTemplateRepository(connection))
+                            new TemplateServiceImpl(new SqlAddressRepository(connection), new SqlTemplateRepository(connection))
                     );
             try {
                 interpreter.execute();

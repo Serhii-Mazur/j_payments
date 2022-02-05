@@ -4,6 +4,7 @@ import application.domain.Address;
 import application.port.AddressRepository;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -17,8 +18,36 @@ public class SqlAddressRepository implements AddressRepository {
     }
 
     @Override
-    public List<Address> getAddresses(UUID userID) {
+    public List<Address> getAddresses(String userEmail) {
         return null;
+    }
+
+    @Override
+    public UUID getAddressID(String address) {
+        String GET_ADDRESS_ID_QUERY = String.format("SELECT id FROM mono.addresses " +
+                "WHERE address = '%s';", address);
+
+        UUID result;
+        try (
+                Statement stmt = dbConnection.createStatement(
+                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.CONCUR_READ_ONLY
+                )
+        ) {
+            ResultSet rs = stmt.executeQuery(GET_ADDRESS_ID_QUERY);
+            rs.last();
+            if (rs.getRow() == 1) {
+                result = rs.getObject("id", java.util.UUID.class);
+            } else {
+                throw new SQLException("ResultSet contains more than the only one record!\n" +
+                        "CHeck source data.");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            result = null;
+        }
+        return result;
     }
 
     @Override

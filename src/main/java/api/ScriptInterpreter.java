@@ -77,26 +77,33 @@ public class ScriptInterpreter {
     private boolean executeCommand(String command, String data) {
         boolean result = false;
         switch (command) {
-            case "REG_USER":
+            case "REG_USER": {
                 String[] splittedUserData = data.split("\\|");
                 String fullName = splittedUserData[0];
                 String eMail = splittedUserData[1];
                 String phoneNumber = splittedUserData[2];
-                userService.addNewUser(fullName, eMail, phoneNumber);
-//                System.out.printf("%s, %s, %s", fullName, eMail, phoneNumber);
+                result = userService.addNewUser(fullName, eMail, phoneNumber);
+            }
                 break;
-            case "ADD_ADDR":
+            case "ADD_ADDR": {
                 String[] splittedAddressData = data.split("\\|");
                 String address = splittedAddressData[0];
                 String userEmail = splittedAddressData[1];
-                addressService.addNewAddress(address, userEmail);
-//                System.out.printf("%s, %s, %s", fullName, eMail, phoneNumber);
+                result = addressService.addNewAddress(address, userEmail);
+            }
                 break;
-            case "ADD_TMPL":
-
+            case "ADD_TMPL": {
+                String[] splittedTemplateData = data.split("\\|");
+                String templateName = splittedTemplateData[0];
+                String paymentPurpose = splittedTemplateData[1];
+                String iban = splittedTemplateData[2];
+                String address = splittedTemplateData[3];
+                result = templateService.addNewTemplate(templateName, address, paymentPurpose, iban);
+            }
                 break;
-            case "ADD_PMNT":
+            case "ADD_PMNT": {
 
+            }
                 break;
         }
         return result;

@@ -37,7 +37,7 @@ public class SqlTemplateRepository implements TemplateRepository {
         String ADD_TEMPLATE_QUERY = String.format("INSERT INTO mono.templates (id, template_name, address_id, payment_purpose, iban) " +
                 "VALUES ('%s', '%s', '%s', '%s', '%s');", id, template_name, address_id, payment_purpose, iban);
 
-        boolean result;
+        boolean result = false;
 
         try (
                 Statement stmt = dbConnection.createStatement()
@@ -47,7 +47,6 @@ public class SqlTemplateRepository implements TemplateRepository {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            result = false;
         }
         return result;
     }
