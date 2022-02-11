@@ -1,11 +1,10 @@
-package dao;
+package dal;
 
 import application.domain.User;
 import application.port.UserRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 

@@ -1,8 +1,7 @@
-package dao;
+package dal;
 
 import application.domain.Address;
 import application.port.AddressRepository;
-import org.postgresql.util.PGobject;
 
 import java.sql.*;
 import java.util.List;

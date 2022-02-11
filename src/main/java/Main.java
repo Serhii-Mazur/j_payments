@@ -2,7 +2,7 @@ import api.ScriptInterpreter;
 import application.service.AddressServiceImpl;
 import application.service.TemplateServiceImpl;
 import application.service.UserServiceImpl;
-import dao.*;
+import dal.*;
 
 import java.io.IOException;
 import java.sql.Connection;

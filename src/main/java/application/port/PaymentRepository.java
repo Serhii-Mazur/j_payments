@@ -1,16 +1,16 @@
 package application.port;
 
-import application.domain.Address;
+import application.domain.Payment;
 import application.domain.Template;
+import dal.SqlPaymentRepository;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 public interface PaymentRepository {
-    List<Template> getPaymentsByUser(UUID userID);
-    List<Template> getPaymentsByAddress(UUID addressID);
-    List<Template> getPaymentsByTemplate(UUID templateID);
+    List<Template> getPaymentsByUser(UUID userID) throws SqlPaymentRepository.SQLPaymentRepositoryExcception;
+    List<Template> getPaymentsByAddress(UUID addressID) throws SqlPaymentRepository.SQLPaymentRepositoryExcception;
+    List<Template> getPaymentsByTemplate(UUID templateID) throws SqlPaymentRepository.SQLPaymentRepositoryExcception;
 
-    boolean addTemplate(@NotNull Template template);
+    boolean addNewPayment(Payment payment);
 }

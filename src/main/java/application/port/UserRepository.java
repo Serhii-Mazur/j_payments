@@ -1,7 +1,7 @@
 package application.port;
 
 import application.domain.User;
-import dao.SqlUserRepository;
+import dal.SqlUserRepository;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
