@@ -1,9 +1,9 @@
 package application.domain;
 
-import java.util.UUID;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public class User {
-//    private UUID userID = UUID.randomUUID();
     private String fullName;
     private String eMail;
     private String phoneNumber;
@@ -14,9 +14,18 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-//    public UUID getUserID() {
-//        return userID;
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return fullName.equals(user.fullName) && eMail.equals(user.eMail) && phoneNumber.equals(user.phoneNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullName, eMail, phoneNumber);
+    }
 
     public String getFullName() {
         return fullName;

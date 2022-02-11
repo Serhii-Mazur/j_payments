@@ -3,9 +3,8 @@ package application.domain;
 import application.constants.PaymentStatus;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Payment {
@@ -17,12 +16,12 @@ public class Payment {
     private final LocalDateTime createdDateTime;
     private LocalDateTime statusChangedDateTime;
 
-    public Payment(@NotNull UUID paymentID,
-                   @NotNull UUID templateID,
+    public Payment(UUID paymentID,
+                   UUID templateID,
                    long cardNumber,
                    float paymentAmount,
                    PaymentStatus paymentStatus,
-                   @NotNull LocalDateTime createdDateTime,
+                   LocalDateTime createdDateTime,
                    LocalDateTime statusChangedDateTime)
     {
         this.paymentID = paymentID;
@@ -43,5 +42,54 @@ public class Payment {
                 PaymentStatus.NEW,
                 LocalDateTime.now(),
                 null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Payment payment = (Payment) o;
+        return paymentID.equals(payment.paymentID) && templateID.equals(payment.templateID) && paymentStatus == payment.paymentStatus;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(paymentID, templateID, paymentStatus);
+    }
+
+    public UUID getPaymentID() {
+        return paymentID;
+    }
+
+    public UUID getTemplateID() {
+        return templateID;
+    }
+
+    public long getCardNumber() {
+        return cardNumber;
+    }
+
+    public float getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    public LocalDateTime getCreatedDateTime() {
+        return createdDateTime;
+    }
+
+    public LocalDateTime getStatusChangedDateTime() {
+        return statusChangedDateTime;
+    }
+
+    public void setStatusChangedDateTime(LocalDateTime statusChangedDateTime) {
+        this.statusChangedDateTime = statusChangedDateTime;
     }
 }

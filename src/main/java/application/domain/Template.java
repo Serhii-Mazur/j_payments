@@ -1,9 +1,11 @@
 package application.domain;
 
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Template {
-    private UUID templateID;
+    private final UUID templateID;
     private UUID addressID;
     private String paymentPurpose;
     private String templateName;
@@ -15,6 +17,19 @@ public class Template {
         this.paymentPurpose = paymentPurpose;
         this.iban = iban;
         this.templateID = UUID.randomUUID();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Template template = (Template) o;
+        return templateID.equals(template.templateID) && addressID.equals(template.addressID) && iban.equals(template.iban);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(templateID, addressID, iban);
     }
 
     public UUID getTemplateID() {

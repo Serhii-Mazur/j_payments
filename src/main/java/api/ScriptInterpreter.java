@@ -82,6 +82,7 @@ public class ScriptInterpreter {
                 String fullName = splittedUserData[0];
                 String eMail = splittedUserData[1];
                 String phoneNumber = splittedUserData[2];
+
                 result = userService.addNewUser(fullName, eMail, phoneNumber);
             }
                 break;
@@ -89,6 +90,7 @@ public class ScriptInterpreter {
                 String[] splittedAddressData = data.split("\\|");
                 String address = splittedAddressData[0];
                 String userEmail = splittedAddressData[1];
+
                 result = addressService.addNewAddress(address, userEmail);
             }
                 break;
@@ -98,6 +100,7 @@ public class ScriptInterpreter {
                 String paymentPurpose = splittedTemplateData[1];
                 String iban = splittedTemplateData[2];
                 String address = splittedTemplateData[3];
+
                 result = templateService.addNewTemplate(templateName, address, paymentPurpose, iban);
             }
                 break;
