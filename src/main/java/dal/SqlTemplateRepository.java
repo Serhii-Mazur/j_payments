@@ -5,6 +5,7 @@ import application.port.TemplateRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,36 @@ public class SqlTemplateRepository implements TemplateRepository {
     @Override
     public List<Template> getTemplatesByAddress(UUID addressID) {
         return null;
+    }
+
+    @Override
+    public UUID getTemplateIdByAddressAndTemplateName(String address, String templateName) {
+        String GET_TEMPLATE_ID_QUERY =
+//                "SELECT id FROM mono.addresses WHERE address = ?";
+                "SELECT templ.id FROM (" +
+                "SELECT * FROM mono.addresses WHERE address = ?) AS addr " +
+                "LEFT JOIN (" +
+                "SELECT * FROM mono.templates t WHERE template_name = ?) AS templ " +
+                "ON addr.id = templ.address_id";
+
+        UUID result = null;
+        ResultSet resultSet = null;
+        try (
+                PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_TEMPLATE_ID_QUERY)
+        ) {
+            int pos = 0;
+            preparedStatement.setString(++pos, address);
+            preparedStatement.setString(++pos, templateName);
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                result = (UUID) resultSet.getObject(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     @Override

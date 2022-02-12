@@ -12,5 +12,5 @@ public interface PaymentRepository {
     List<Template> getPaymentsByAddress(UUID addressID) throws SqlPaymentRepository.SQLPaymentRepositoryExcception;
     List<Template> getPaymentsByTemplate(UUID templateID) throws SqlPaymentRepository.SQLPaymentRepositoryExcception;
 
-    boolean addNewPayment(Payment payment);
+    boolean addPayment(Payment payment);
 }

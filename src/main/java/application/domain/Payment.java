@@ -2,7 +2,6 @@ package application.domain;
 
 import application.constants.PaymentStatus;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,23 +13,24 @@ public class Payment {
     private final float paymentAmount;
     private PaymentStatus paymentStatus;
     private final LocalDateTime createdDateTime;
-    private LocalDateTime statusChangedDateTime;
+    private LocalDateTime etlDateTime;
 
-    public Payment(UUID paymentID,
-                   UUID templateID,
-                   long cardNumber,
-                   float paymentAmount,
-                   PaymentStatus paymentStatus,
-                   LocalDateTime createdDateTime,
-                   LocalDateTime statusChangedDateTime)
-    {
+    public Payment(
+            UUID paymentID,
+            UUID templateID,
+            long cardNumber,
+            float paymentAmount,
+            PaymentStatus paymentStatus,
+            LocalDateTime createdDateTime,
+            LocalDateTime etlDateTime
+    ) {
         this.paymentID = paymentID;
         this.templateID = templateID;
         this.cardNumber = cardNumber;
         this.paymentAmount = paymentAmount;
         this.paymentStatus = paymentStatus;
         this.createdDateTime = createdDateTime;
-        this.statusChangedDateTime = statusChangedDateTime;
+        this.etlDateTime = etlDateTime;
     }
 
     public Payment(UUID templateID, long cardNumber, float paymentAmount) {
@@ -41,7 +41,8 @@ public class Payment {
                 paymentAmount,
                 PaymentStatus.NEW,
                 LocalDateTime.now(),
-                null);
+                LocalDateTime.now()
+        );
     }
 
     @Override
@@ -85,11 +86,11 @@ public class Payment {
         return createdDateTime;
     }
 
-    public LocalDateTime getStatusChangedDateTime() {
-        return statusChangedDateTime;
+    public LocalDateTime getEtlDateTime() {
+        return etlDateTime;
     }
 
-    public void setStatusChangedDateTime(LocalDateTime statusChangedDateTime) {
-        this.statusChangedDateTime = statusChangedDateTime;
+    public void setEtlDateTime(LocalDateTime etlDateTime) {
+        this.etlDateTime = etlDateTime;
     }
 }

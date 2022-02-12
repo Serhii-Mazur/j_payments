@@ -1,9 +1,7 @@
 package api;
 
 import application.constants.ScriptCommands;
-import application.service.AddressService;
-import application.service.TemplateService;
-import application.service.UserService;
+import application.service.*;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -23,15 +21,18 @@ public class ScriptInterpreter {
     private final UserService userService;
     private final AddressService addressService;
     private final TemplateService templateService;
+    private final PaymentService paymentService;
 
     public ScriptInterpreter(
             UserService userService,
             AddressService addressService,
-            TemplateService templateService
+            TemplateService templateService,
+            PaymentService paymentService
     ) {
         this.userService = userService;
         this.addressService = addressService;
         this.templateService = templateService;
+        this.paymentService = paymentService;
     }
 
     public void execute() throws IOException {
@@ -77,35 +78,41 @@ public class ScriptInterpreter {
     private boolean executeCommand(String command, String data) {
         boolean result = false;
         switch (command) {
-            case "REG_USER": {
-                String[] splittedUserData = data.split("\\|");
-                String fullName = splittedUserData[0];
-                String eMail = splittedUserData[1];
-                String phoneNumber = splittedUserData[2];
-
-                result = userService.addNewUser(fullName, eMail, phoneNumber);
-            }
-                break;
-            case "ADD_ADDR": {
-                String[] splittedAddressData = data.split("\\|");
-                String address = splittedAddressData[0];
-                String userEmail = splittedAddressData[1];
-
-                result = addressService.addNewAddress(address, userEmail);
-            }
-                break;
-            case "ADD_TMPL": {
-                String[] splittedTemplateData = data.split("\\|");
-                String templateName = splittedTemplateData[0];
-                String paymentPurpose = splittedTemplateData[1];
-                String iban = splittedTemplateData[2];
-                String address = splittedTemplateData[3];
-
-                result = templateService.addNewTemplate(templateName, address, paymentPurpose, iban);
-            }
-                break;
+//            case "REG_USER": {
+//                String[] splittedUserData = data.split("\\|");
+//                String fullName = splittedUserData[0];
+//                String eMail = splittedUserData[1];
+//                String phoneNumber = splittedUserData[2];
+//
+//                result = userService.addNewUser(fullName, eMail, phoneNumber);
+//            }
+//                break;
+//            case "ADD_ADDR": {
+//                String[] splittedAddressData = data.split("\\|");
+//                String address = splittedAddressData[0];
+//                String userEmail = splittedAddressData[1];
+//
+//                result = addressService.addNewAddress(address, userEmail);
+//            }
+//                break;
+//            case "ADD_TMPL": {
+//                String[] splittedTemplateData = data.split("\\|");
+//                String templateName = splittedTemplateData[0];
+//                String paymentPurpose = splittedTemplateData[1];
+//                String iban = splittedTemplateData[2];
+//                String address = splittedTemplateData[3];
+//
+//                result = templateService.addNewTemplate(templateName, address, paymentPurpose, iban);
+//            }
+//                break;
             case "ADD_PMNT": {
+                String[] splittedPaymentData = data.split("\\|");
+                long cardNumber = Long.parseLong(splittedPaymentData[0]);
+                float paymentAmount = Float.parseFloat(splittedPaymentData[1]);
+                String templateName = splittedPaymentData[2];
+                String address = splittedPaymentData[3];
 
+                result = paymentService.addNewPayment(cardNumber, paymentAmount, templateName, address);
             }
                 break;
         }

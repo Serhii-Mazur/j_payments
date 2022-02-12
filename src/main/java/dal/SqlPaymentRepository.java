@@ -34,22 +34,22 @@ public class SqlPaymentRepository implements PaymentRepository {
     }
 
     @Override
-    public boolean addNewPayment(Payment payment) {
+    public boolean addPayment(Payment payment) {
         UUID id = payment.getPaymentID();
         UUID templateID = payment.getTemplateID();
         long cardNumber = payment.getCardNumber();
         float paymentAmount = payment.getPaymentAmount();
         String paymentStatus = payment.getPaymentStatus().toString();   // TODO: modify according to 3NF of DB
         LocalDateTime createdDateTime = payment.getCreatedDateTime();
-        LocalDateTime etlDateTime = payment.getStatusChangedDateTime(); // TODO: method's name could be changed
+        LocalDateTime etlDateTime = payment.getEtlDateTime(); // TODO: method's name could be changed
 
-        String ADD_TEMPLATE_QUERY =
-                "INSERT INTO mono.templates " +
-                        "(id, template_id, card_number, paymentAmount, payment_status, create_time, etl_time) " +
+        String ADD_PAYMENT_QUERY =
+                "INSERT INTO mono.payments " +
+                        "(id, template_id, card_number, payment_amount, payment_status, created_date_time, etl_date_time) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         boolean result = false;
-        try (PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_TEMPLATE_QUERY)) {
+        try (PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_PAYMENT_QUERY)) {
             int pos = 0;
             preparedStatement.setObject(++pos, id);
             preparedStatement.setObject(++pos, templateID);

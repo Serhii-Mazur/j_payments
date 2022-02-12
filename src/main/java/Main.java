@@ -1,5 +1,10 @@
 import api.ScriptInterpreter;
+import application.port.AddressRepository;
+import application.port.PaymentRepository;
+import application.port.TemplateRepository;
+import application.port.UserRepository;
 import application.service.AddressServiceImpl;
+import application.service.PaymentServiceImpl;
 import application.service.TemplateServiceImpl;
 import application.service.UserServiceImpl;
 import dal.*;
@@ -11,11 +16,17 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) {
         try (Connection connection = DatabaseConnector.getDbConnection(new DatabaseConfig())) {
+            UserRepository userRepository = new SqlUserRepository(connection);
+            AddressRepository addressRepository = new SqlAddressRepository(connection);
+            TemplateRepository templateRepository = new SqlTemplateRepository(connection);
+            PaymentRepository paymentRepository = new SqlPaymentRepository(connection);
+
             ScriptInterpreter interpreter = new ScriptInterpreter
                     (
-                            new UserServiceImpl(new SqlUserRepository(connection)),
-                            new AddressServiceImpl(new SqlAddressRepository(connection)),
-                            new TemplateServiceImpl(new SqlAddressRepository(connection), new SqlTemplateRepository(connection))
+                            new UserServiceImpl(userRepository),
+                            new AddressServiceImpl(addressRepository),
+                            new TemplateServiceImpl(addressRepository, templateRepository),
+                            new PaymentServiceImpl(addressRepository, templateRepository, paymentRepository)
                     );
             try {
                 interpreter.execute();
