@@ -58,7 +58,7 @@ public class SqlTemplateRepository implements TemplateRepository {
     }
 
     @Override
-    public boolean addTemplate(Template template) {
+    public void addTemplate(Template template) {
         UUID id = template.getTemplateID();
         UUID addressID = template.getAddressID();
         String templateName = template.getTemplateName();
@@ -70,8 +70,6 @@ public class SqlTemplateRepository implements TemplateRepository {
         String ADD_TEMPLATE_QUERY =
             "INSERT INTO mono.templates (id, template_name, address_id, payment_purpose, iban) VALUES (?, ?, ?, ?, ?)";
 
-        boolean result = false;
-
         try (
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_TEMPLATE_QUERY)
         ) {
@@ -82,11 +80,10 @@ public class SqlTemplateRepository implements TemplateRepository {
             preparedStatement.setString(++pos, paymentPurpose);
             preparedStatement.setString(++pos, iban);
 
-            result = preparedStatement.execute();
+            preparedStatement.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
     }
 }

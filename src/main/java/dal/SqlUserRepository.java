@@ -21,14 +21,12 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean addUser(User user) {
+    public void addUser(User user) {
         String full_name = user.getFullName();
         String email = user.getEmail();
         String phone_number = user.getPhoneNumber();
 
         String ADD_USER_QUERY = "INSERT INTO mono.users (full_name, email, phone_number) VALUES (?, ?, ?)";
-
-        boolean result = false;
 
         try (PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_USER_QUERY)) {
             int pos = 0;
@@ -36,11 +34,10 @@ public class SqlUserRepository implements UserRepository {
             preparedStatement.setString(++pos, email);
             preparedStatement.setString(++pos, phone_number);
 
-            result = preparedStatement.execute();
+            preparedStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
     }
 
     @Override

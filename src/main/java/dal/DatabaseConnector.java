@@ -5,9 +5,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnector {
+    private static Connection connection;
+
+    private DatabaseConnector() {
+
+    }
+
     public static Connection getDbConnection(DatabaseConfig dbConfig)
             throws ClassNotFoundException, SQLException {
-        Class.forName("org."+ dbConfig.getDbType() + ".Driver");
-        return DriverManager.getConnection(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword());
+
+        if (connection == null) {
+            Class.forName("org."+ dbConfig.getDbType() + ".Driver");
+            connection = DriverManager.getConnection(dbConfig.getUrl(), dbConfig.getUser(), dbConfig.getPassword());
+        }
+        return connection;
     }
 }

@@ -1,7 +1,6 @@
 package application.service;
 
 import application.domain.Payment;
-import application.domain.Template;
 import application.port.AddressRepository;
 import application.port.PaymentRepository;
 import application.port.TemplateRepository;
@@ -24,10 +23,10 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public boolean addNewPayment(long cardNumber, float paymentAmount, String templateName, String address) {
+    public void addNewPayment(long cardNumber, float paymentAmount, String templateName, String address) {
         UUID templateID = templateRepository.getTemplateIdByAddressAndTemplateName(address, templateName);  // It works!
         Payment newPayment = new Payment(templateID, cardNumber, paymentAmount);
 
-        return paymentRepository.addPayment(newPayment);
+        paymentRepository.addPayment(newPayment);
     }
 }

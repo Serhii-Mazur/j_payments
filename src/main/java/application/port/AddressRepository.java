@@ -10,5 +10,5 @@ public interface AddressRepository {
 
     UUID getAddressID(String address);
 
-    boolean addAddress(Address paymentAddress);
+    void addAddress(Address paymentAddress);
 }

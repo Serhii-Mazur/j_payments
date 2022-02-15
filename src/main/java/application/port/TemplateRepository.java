@@ -9,6 +9,6 @@ public interface TemplateRepository {
     List<Template> getTemplatesByUser(UUID userID);
     List<Template> getTemplatesByAddress(UUID addressID);
 
-    boolean addTemplate(Template template);
+    void addTemplate(Template template);
     UUID getTemplateIdByAddressAndTemplateName(String address, String templateName);
 }

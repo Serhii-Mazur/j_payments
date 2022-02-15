@@ -17,9 +17,9 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public boolean addNewTemplate(String templateName, String address, String paymentPurpose, String iban) {
+    public void addNewTemplate(String templateName, String address, String paymentPurpose, String iban) {
         UUID addressID = addressRepository.getAddressID(address);
         Template newTemplate = new Template(addressID, templateName, paymentPurpose, iban);
-        return templateRepository.addTemplate(newTemplate);
+        templateRepository.addTemplate(newTemplate);
     }
 }

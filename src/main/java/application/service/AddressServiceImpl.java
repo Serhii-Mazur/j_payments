@@ -2,7 +2,6 @@ package application.service;
 
 import application.domain.Address;
 import application.port.AddressRepository;
-import application.port.UserRepository;
 
 public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
@@ -12,8 +11,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public boolean addNewAddress(String address, String userEmail) {
+    public void addNewAddress(String address, String userEmail) {
         Address newAddress = new Address(address, userEmail);
-        return addressRepository.addAddress(newAddress);
+        addressRepository.addAddress(newAddress);
     }
 }

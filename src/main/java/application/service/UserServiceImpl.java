@@ -11,8 +11,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean addNewUser(String fullName, String eMail, String phoneNumber) {
+    public void addNewUser(String fullName, String eMail, String phoneNumber) {
         User newUser = new User(fullName, eMail, phoneNumber);
-        return userRepository.addUser(newUser);
+        userRepository.addUser(newUser);
     }
 }

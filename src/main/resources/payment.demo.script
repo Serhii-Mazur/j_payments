@@ -7,5 +7,6 @@ ADD_TMPL:Heating Korotka|Payment for heating Kyiv, Korotka st. 39|UA903052992990
 ADD_TMPL:Electricity Korotka|Payment for electric energy Kyiv, Korotka st. 39|UA903052992990004149123456789|Kyiv, Korotka st. 39
 ADD_PMNT:1234567890111213|2346.52|Heating Dovga|Dnipro, Dovga st. 137
 ADD_PMNT:1234567890111213|922.78|Electricity Dovga|Dnipro, Dovga st. 137
-ADD_PMNT:1234567890111213|2937.90|Heating Korotka|Kyiv, Korotka st. 39
-ADD_PMNT:1234567890111213|1207.13|Electricity Korotka|Kyiv, Korotka st. 39
+ADD_PMNT:4321876511101312|2937.90|Heating Korotka|Kyiv, Korotka st. 39
+ADD_PMNT:4321876511101312|1207.13|Electricity Korotka|Kyiv, Korotka st. 39
+PROCESS_ALL_PAYMENTS:1

@@ -48,14 +48,12 @@ public class SqlAddressRepository implements AddressRepository {
     }
 
     @Override
-    public boolean addAddress(Address paymentAddress) {
+    public void addAddress(Address paymentAddress) {
         String user_email = paymentAddress.getUserEmail();
         String address = paymentAddress.getAddress();
         UUID id = paymentAddress.getAddressID();
 
         String ADD_ADDRESS_QUERY = "INSERT INTO mono.addresses (id, address, user_email) VALUES (?, ?, ?)";
-
-        boolean result = false;
 
         try (PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_ADDRESS_QUERY)) {
             int pos = 0;
@@ -63,13 +61,10 @@ public class SqlAddressRepository implements AddressRepository {
             preparedStatement.setString(++pos, address);
             preparedStatement.setString(++pos, user_email);
 
-
-
-            result = preparedStatement.execute();
+            preparedStatement.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
     }
 }
