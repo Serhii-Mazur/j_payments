@@ -6,33 +6,46 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 public class DatabaseConfig {
+    private final String CONFIG_FILE_PATH;
+//    private final Properties DB_PROPERTIES = new Properties();
     private final String dbType;
     private final String dbSchema;
     private final String user;
     private final String password;
     private final String url;
+    private static DatabaseConfig instance;
 
-    public DatabaseConfig() throws ConfigDBException {
-        final Properties dbProperties = new Properties();
-        Path conf = Path.of(
-                System.getProperty("user.dir"),
-                "src\\main\\resources",
-                "config.dbaccess.properties");
-        try {
-            dbProperties.load(Files.newBufferedReader(conf));
-        } catch (IOException e) {
-            throw new ConfigDBException("Can't load database properties. ", e);
-//            e.printStackTrace();    // TODO: modify this block
+    public DatabaseConfig(String configFilePath, String dbType, String dbSchema, String user, String password, String url) {
+        this.CONFIG_FILE_PATH = configFilePath;
+        this.dbType = dbType;
+        this.dbSchema = dbSchema;
+        this.user = user;
+        this.password = password;
+        this.url = url;
+    }
+
+    public static DatabaseConfig init(String configFilePath) throws ConfigDBException {
+        if (instance == null) {
+            final Properties DB_PROPERTIES = new Properties();
+            try {
+                DB_PROPERTIES.load(Files.newBufferedReader(Path.of(configFilePath)));
+            } catch (IOException e) {
+                throw new ConfigDBException("Can't load database properties. ", e);
+            }
+            String dbType = DB_PROPERTIES.getProperty("dbtype");
+            String dbSchema = DB_PROPERTIES.getProperty("dbschema");
+            String user = DB_PROPERTIES.getProperty("user");
+            String password = DB_PROPERTIES.getProperty("password");
+            String url =
+                    "jdbc:" + dbType + "://" +
+                            DB_PROPERTIES.getProperty("dbhost") + ":" +
+                            DB_PROPERTIES.getProperty("dbport") + "/" +
+                            DB_PROPERTIES.getProperty("dbname");
+            instance = new DatabaseConfig(configFilePath, dbType, dbSchema, user, password, url);
         }
-        this.dbType = dbProperties.getProperty("dbtype");
-        this.dbSchema = dbProperties.getProperty("dbschema");
-        this.user = dbProperties.getProperty("user");
-        this.password = dbProperties.getProperty("password");
-        this.url =
-                "jdbc:" + dbType + "://" +
-                        dbProperties.getProperty("dbhost") + ":" +
-                        dbProperties.getProperty("dbport") + "/" +
-                        dbProperties.getProperty("dbname");
+
+
+        return instance;
     }
 
     public String getDbType() {
@@ -55,7 +68,7 @@ public class DatabaseConfig {
         return url;
     }
 
-    public class ConfigDBException extends Exception {
+    public static class ConfigDBException extends Exception {
         public ConfigDBException() {
             super();
         }

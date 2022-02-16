@@ -24,9 +24,8 @@ public class ScriptInterpreter {
     private final String configFileName = "config.application.properties";
 
     private String scriptFileName;
-//    private int threadAmount;           //  Quantity of threads
-//    private int statusRequestPeriod;    //  Period of payment status request
 
+    private final File inputFile;
     private final UserService userService;
     private final AddressService addressService;
     private final TemplateService templateService;
@@ -35,12 +34,15 @@ public class ScriptInterpreter {
     private final ExecutorService executorService;
 
     public ScriptInterpreter(
+            File inputFile,
             UserService userService,
             AddressService addressService,
             TemplateService templateService,
             PaymentService paymentService,
             PaymentExecutor paymentExecutor,
-            ExecutorService executorService) {
+            ExecutorService executorService)
+    {
+        this.inputFile = inputFile;
         this.userService = userService;
         this.addressService = addressService;
         this.templateService = templateService;
@@ -50,12 +52,8 @@ public class ScriptInterpreter {
     }
 
     public void execute() throws IOException {
-        try {
-            setProperties();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (String line : getScriptLines(getScriptFile())) {
+
+        for (String line : getScriptLines(inputFile)) {
             String[] splittedLine = line.split(":");
             String command = splittedLine[0];
 //            String command = line.substring(0, line.indexOf(':'));
@@ -109,30 +107,29 @@ public class ScriptInterpreter {
             }
                 break;
             case "PROCESS_ALL_PAYMENTS": {
-//                int statusRequestPeriod = Integer.parseInt(data);
                 executorService.execute(paymentExecutor);
             }
         }
     }
 
-    private void setProperties() throws IOException {
-        try {
-            properties.load(Files.newBufferedReader(Path.of(srcDirPath, configFileName).toAbsolutePath()));
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
-        this.scriptFileName = properties.getProperty("script");
+//    private void setProperties() throws IOException {
+//        try {
+//            properties.load(Files.newBufferedReader(Path.of(srcDirPath, configFileName).toAbsolutePath()));
+//        } catch (IOException e) {
+//            throw new IOException(e);
+//        }
+//        this.scriptFileName = properties.getProperty("script");
 //        this.threadAmount = Integer.parseInt(properties.getProperty("thread_pool_capacity"));
 //        this.statusRequestPeriod = Integer.parseInt(properties.getProperty("status_request_period"));
-    }
+//    }
 
-    private File getScriptFile() throws IOException {
-        File scriptFile = new File(Path.of(srcDirPath, scriptFileName).toAbsolutePath().toString());
-        if (!scriptFile.exists()) {
-            throw new IOException(String.format("File %s does not exists!", scriptFile.getName()));
-        }
-        return scriptFile;
-    }
+//    private File getScriptFile() throws IOException {
+//        File scriptFile = new File(Path.of(srcDirPath, scriptFileName).toAbsolutePath().toString());
+//        if (!scriptFile.exists()) {
+//            throw new IOException(String.format("File %s does not exists!", scriptFile.getName()));
+//        }
+//        return scriptFile;
+//    }
 
     private List<String> getScriptLines(File scriptFile) {
         List<String> scriptLines;
@@ -146,6 +143,4 @@ public class ScriptInterpreter {
         }
         return scriptLines;
     }
-
-
 }

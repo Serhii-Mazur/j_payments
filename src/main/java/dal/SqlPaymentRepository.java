@@ -124,9 +124,15 @@ public class SqlPaymentRepository implements PaymentRepository {
                 long cardNumber = resultSet.getLong("card_number");
                 float paymentAmount = resultSet.getFloat("payment_amount");
                 LocalDateTime createdDateTime =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(resultSet.getTimestamp("created_date_time").getTime()), ZoneOffset.UTC);
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(resultSet.getTimestamp("created_date_time").getTime()),
+                                ZoneOffset.of("+02:00")
+                        );
                 LocalDateTime etlDateTime =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(resultSet.getTimestamp("etl_date_time").getTime()), ZoneOffset.UTC);
+                        LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(resultSet.getTimestamp("etl_date_time").getTime()),
+                                ZoneOffset.of("+02:00")
+                        );
                 PaymentStatus paymentStatus = null;
                 String status = resultSet.getString("payment_status");
                 for (PaymentStatus pmntStatus : PaymentStatus.values()) {
