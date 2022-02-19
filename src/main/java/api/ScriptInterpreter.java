@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +26,7 @@ public class ScriptInterpreter {
 
     private String scriptFileName;
 
+    private final Logger logger;
     private final File inputFile;
     private final UserService userService;
     private final AddressService addressService;
@@ -34,6 +36,7 @@ public class ScriptInterpreter {
     private final ExecutorService executorService;
 
     public ScriptInterpreter(
+            Logger logger,
             File inputFile,
             UserService userService,
             AddressService addressService,
@@ -42,6 +45,7 @@ public class ScriptInterpreter {
             PaymentExecutor paymentExecutor,
             ExecutorService executorService)
     {
+        this.logger = logger;
         this.inputFile = inputFile;
         this.userService = userService;
         this.addressService = addressService;
@@ -52,7 +56,8 @@ public class ScriptInterpreter {
     }
 
     public void execute() throws IOException {
-
+        logger.info("Script interpreter started!");
+        executorService.execute(paymentExecutor);
         for (String line : getScriptLines(inputFile)) {
             String[] splittedLine = line.split(":");
             String command = splittedLine[0];
@@ -106,9 +111,9 @@ public class ScriptInterpreter {
                 paymentService.addNewPayment(cardNumber, paymentAmount, templateName, address);
             }
                 break;
-            case "PROCESS_ALL_PAYMENTS": {
-                executorService.execute(paymentExecutor);
-            }
+//            case "PROCESS_ALL_PAYMENTS": {
+//                executorService.execute(paymentExecutor);
+//            }
         }
     }
 

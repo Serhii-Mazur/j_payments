@@ -5,6 +5,7 @@ import application.port.PaymentRepository;
 import application.port.TemplateRepository;
 import application.port.UserRepository;
 import application.service.PaymentExecutor;
+import com.sun.tools.javac.Main;
 import dal.*;
 
 import java.io.File;
@@ -14,10 +15,12 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class ContextContainer {
     private static ContextContainer instance;
-    //    private final Properties properties;
+
+    private final Logger logger;
     private final Connection connection;
     private final File inputFile;
     private final File outputFile;
@@ -35,7 +38,8 @@ public class ContextContainer {
             System.getProperty("user.dir"),
             "src\\main\\output").toAbsolutePath().toString();
 
-    private ContextContainer(File inputFile,
+    private ContextContainer(Logger logger,
+                             File inputFile,
                              File outputFile,
                              Connection connection,
                              UserRepository userRepository,
@@ -44,6 +48,7 @@ public class ContextContainer {
                              PaymentRepository paymentRepository,
                              PaymentExecutor paymentExecutor,
                              PaymentStatusGenerator psGenerator) {
+        this.logger = logger;
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         this.connection = connection;
@@ -55,7 +60,7 @@ public class ContextContainer {
         this.psGenerator = psGenerator;
     }
 
-    public static ContextContainer init(String srcDirPath, String dstDirPath, String configFileName) throws ContextContainerException {
+    public static ContextContainer init(Logger logger, String srcDirPath, String dstDirPath, String configFileName) throws ContextContainerException {
         if (instance == null) {
             Properties properties = new Properties();
             try {
@@ -79,16 +84,17 @@ public class ContextContainer {
                 inputFile = createInputFile(inputFilePath);
                 outputFile = createOutputFile(outputFilePath);
                 connection = createConnection(dbConfigFilePath);
-                userRepository = createUserRepository(connection);
-                addressRepository = createAddressRepository(connection);
-                templateRepository = createTemplateRepository(connection);
-                paymentRepository = createPaymentRepository(connection);
+                userRepository = createUserRepository(logger, connection);
+                addressRepository = createAddressRepository(logger, connection);
+                templateRepository = createTemplateRepository(logger, connection);
+                paymentRepository = createPaymentRepository(logger, connection);
                 psGenerator = createPaymentStatusGenerator();
-                paymentExecutor = createPaymentExecutor(paymentRepository, psGenerator);
+                paymentExecutor = createPaymentExecutor(logger, paymentRepository, psGenerator);
             } catch (ContextContainerException e) {
                 throw e;
             }
             instance = new ContextContainer(
+                    logger,
                     inputFile,
                     outputFile,
                     connection,
@@ -171,7 +177,8 @@ public class ContextContainer {
         Connection connection = null;
 //        String configFilePath = Path.of(srcDirPath, properties.getProperty("dbconfig_file_name")).toAbsolutePath().toString();
         try {
-            connection = DatabaseConnector.getDbConnection(DatabaseConfig.init(dbConfigFilePath));
+//            connection = DatabaseConnector.getDbConnection(DatabaseConfig.init(dbConfigFilePath));
+            connection = DatabaseConnector.getPooledConnection(DatabaseConfig.init(dbConfigFilePath));
         } catch (DatabaseConfig.ConfigDBException
                 | ClassNotFoundException
                 | SQLException e) {
@@ -180,24 +187,24 @@ public class ContextContainer {
         return connection;
     }
 
-    private static UserRepository createUserRepository(Connection connection) {
-        return new SqlUserRepository(connection);
+    private static UserRepository createUserRepository(Logger logger, Connection connection) {
+        return new SqlUserRepository(logger, connection);
     }
 
-    private static AddressRepository createAddressRepository(Connection connection) {
-        return new SqlAddressRepository(connection);
+    private static AddressRepository createAddressRepository(Logger logger, Connection connection) {
+        return new SqlAddressRepository(logger, connection);
     }
 
-    private static TemplateRepository createTemplateRepository(Connection connection) {
-        return new SqlTemplateRepository(connection);
+    private static TemplateRepository createTemplateRepository(Logger logger, Connection connection) {
+        return new SqlTemplateRepository(logger, connection);
     }
 
-    private static PaymentRepository createPaymentRepository(Connection connection) {
-        return new SqlPaymentRepository(connection);
+    private static PaymentRepository createPaymentRepository(Logger logger, Connection connection) {
+        return new SqlPaymentRepository(logger, connection);
     }
 
-    private static PaymentExecutor createPaymentExecutor(PaymentRepository paymentRepository, PaymentStatusGenerator psGenerator) {
-        return new PaymentExecutor(paymentRepository, psGenerator);
+    private static PaymentExecutor createPaymentExecutor(Logger logger, PaymentRepository paymentRepository, PaymentStatusGenerator psGenerator) {
+        return new PaymentExecutor(logger, paymentRepository, psGenerator);
     }
 
     private static PaymentStatusGenerator createPaymentStatusGenerator() {

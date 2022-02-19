@@ -18,27 +18,6 @@ public class PaymentStatusGenerator {
         this.random = new Random();
     }
 
-    public PaymentStatus getNewStatus(int counter) {
-        PaymentStatus result = null;
-        if (counter > 2) {
-            int status = random.nextInt(3);
-            switch (status) {
-                case 0:
-                    result = PaymentStatus.NEW;
-                    break;
-                case 1:
-                    result = PaymentStatus.DONE;
-                    break;
-                case 2:
-                    result = PaymentStatus.FAILED;
-                    break;
-            }
-        } else {
-            result = PaymentStatus.NEW;
-        }
-        return result;
-    }
-
     public PaymentStatus getNewStatus(Payment payment) {
         PaymentStatus result = PaymentStatus.NEW;
         LocalDateTime createdDateTime = payment.getCreatedDateTime();

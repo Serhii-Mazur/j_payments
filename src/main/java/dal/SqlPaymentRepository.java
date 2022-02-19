@@ -3,6 +3,7 @@ package dal;
 import application.constants.PaymentStatus;
 import application.domain.Payment;
 import application.port.PaymentRepository;
+import org.postgresql.ds.PGConnectionPoolDataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,11 +15,14 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class SqlPaymentRepository implements PaymentRepository {
+    private final Logger logger;
     private final Connection dbConnection;
 
-    public SqlPaymentRepository(Connection dbConnection) {
+    public SqlPaymentRepository(Logger logger, Connection dbConnection) {
+        this.logger = logger;
         this.dbConnection = dbConnection;
     }
 
@@ -59,6 +63,7 @@ public class SqlPaymentRepository implements PaymentRepository {
 
     @Override
     public void addPayment(Payment payment) {
+        long start = System.nanoTime();
         UUID id = payment.getPaymentID();
         UUID templateID = payment.getTemplateID();
         long cardNumber = payment.getCardNumber();
@@ -87,6 +92,23 @@ public class SqlPaymentRepository implements PaymentRepository {
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
+        long end = System.nanoTime();
+        String report = String.format("Payment added:%n" +
+                        "Payment ID     : %s%n" +
+                        "Template ID    : %s%n" +
+                        "Card number    : %s%n" +
+                        "Payment amount : %.2f%n" +
+                        "Payment status : %s%n" +
+                        "Created        : %s%n" +
+                        "Updated        : %s%n",
+                payment.getPaymentID(),
+                payment.getTemplateID(),
+                payment.getCardNumber(),
+                payment.getPaymentAmount(),
+                payment.getPaymentStatus().name(),
+                payment.getCreatedDateTime(),
+                payment.getEtlDateTime());
+        logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
     }
 
     @Override

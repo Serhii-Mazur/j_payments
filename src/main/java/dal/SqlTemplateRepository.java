@@ -9,11 +9,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class SqlTemplateRepository implements TemplateRepository {
+    private final Logger logger;
     private final Connection dbConnection;
 
-    public SqlTemplateRepository(Connection dbConnection) {
+    public SqlTemplateRepository(Logger logger, Connection dbConnection) {
+        this.logger = logger;
         this.dbConnection = dbConnection;
     }
 
@@ -59,6 +62,7 @@ public class SqlTemplateRepository implements TemplateRepository {
 
     @Override
     public void addTemplate(Template template) {
+        long start = System.nanoTime();
         UUID id = template.getTemplateID();
         UUID addressID = template.getAddressID();
         String templateName = template.getTemplateName();
@@ -85,5 +89,18 @@ public class SqlTemplateRepository implements TemplateRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        long end = System.nanoTime();
+        String report = String.format("Template added:%n" +
+                        "Template ID    : %s%n" +
+                        "Template name  : %s%n" +
+                        "Address ID     : %s%n" +
+                        "Payment purpose: %s%n" +
+                        "IBAN           : %s%n",
+                template.getTemplateID(),
+                template.getTemplateName(),
+                template.getAddressID(),
+                template.getPaymentPurpose(),
+                template.getIban());
+        logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
     }
 }

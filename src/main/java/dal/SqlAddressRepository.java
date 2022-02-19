@@ -6,11 +6,14 @@ import application.port.AddressRepository;
 import java.sql.*;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class SqlAddressRepository implements AddressRepository {
     private final Connection dbConnection;
+    private final Logger logger;
 
-    public SqlAddressRepository(Connection dbConnection) {
+    public SqlAddressRepository(Logger logger, Connection dbConnection) {
+        this.logger= logger;
         this.dbConnection = dbConnection;
     }
 
@@ -49,6 +52,7 @@ public class SqlAddressRepository implements AddressRepository {
 
     @Override
     public void addAddress(Address paymentAddress) {
+        long start = System.nanoTime();
         String user_email = paymentAddress.getUserEmail();
         String address = paymentAddress.getAddress();
         UUID id = paymentAddress.getAddressID();
@@ -66,5 +70,14 @@ public class SqlAddressRepository implements AddressRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        long end = System.nanoTime();
+        String report = String.format("Payment address added:%n" +
+                        "Address ID     : %s%n" +
+                        "Address        : %s%n" +
+                        "User e-mail    : %s%n",
+                paymentAddress.getAddressID(),
+                paymentAddress.getAddress(),
+                paymentAddress.getUserEmail());
+        logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
     }
 }

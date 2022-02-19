@@ -29,8 +29,8 @@ public class Payment {
         this.cardNumber = cardNumber;
         this.paymentAmount = paymentAmount;
         this.paymentStatus = paymentStatus;
-        this.createdDateTime = createdDateTime;
-        this.etlDateTime = etlDateTime;
+        this.createdDateTime = createdDateTime.withNano(0);
+        this.etlDateTime = etlDateTime.withNano(0);
     }
 
     public Payment(UUID templateID, long cardNumber, float paymentAmount) {
