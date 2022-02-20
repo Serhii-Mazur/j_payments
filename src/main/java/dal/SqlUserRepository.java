@@ -5,7 +5,9 @@ import application.port.UserRepository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,12 +21,26 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> getUsers() throws SQLUserRepositoryException {
-        throw new SQLUserRepositoryException(String.format("Method <%s> not implemented yet!", "getUsers"));
+    public List<User> getAllUsers() throws SQLUserRepositoryException {
+        List<User> result = new ArrayList<>();
+        String GET_ALL_USERS_QUERY = "SELECT * FROM mono.users";
+        try (PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_ALL_USERS_QUERY)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String fullName = resultSet.getString("full_name");
+                String eMail = resultSet.getString("email");
+                String phoneNumber = resultSet.getString("phone_number");
+                User user = new User(fullName, eMail, phoneNumber);
+                result.add(user);
+            }
+        } catch (SQLException e) {
+            throw new SQLUserRepositoryException("Can't execute: ", e);
+        }
+        return result;
     }
 
     @Override
-    public void addUser(User user) {
+    public void addUser(User user) throws SQLUserRepositoryException {
         long start = System.nanoTime();
         String full_name = user.getFullName();
         String email = user.getEmail();
@@ -40,7 +56,7 @@ public class SqlUserRepository implements UserRepository {
 
             preparedStatement.execute();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLUserRepositoryException("Can't execute. ", e);
         }
         long end = System.nanoTime();
         String report = String.format("User added:%n" +
@@ -53,12 +69,7 @@ public class SqlUserRepository implements UserRepository {
         logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
     }
 
-    @Override
-    public User addUser(String fullName, String eMail, String phoneNumber) throws SQLUserRepositoryException {
-        throw new SQLUserRepositoryException(String.format("Method <%s> not implemented yet!", "User addUser"));
-    }
-
-    public class SQLUserRepositoryException extends Exception {
+    public static class SQLUserRepositoryException extends Exception {
         public SQLUserRepositoryException() {
             super();
         }

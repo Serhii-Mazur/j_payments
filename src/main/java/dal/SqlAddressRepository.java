@@ -3,7 +3,11 @@ package dal;
 import application.domain.Address;
 import application.port.AddressRepository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -13,7 +17,7 @@ public class SqlAddressRepository implements AddressRepository {
     private final Logger logger;
 
     public SqlAddressRepository(Logger logger, Connection dbConnection) {
-        this.logger= logger;
+        this.logger = logger;
         this.dbConnection = dbConnection;
     }
 
@@ -23,35 +27,44 @@ public class SqlAddressRepository implements AddressRepository {
     }
 
     @Override
-    public UUID getAddressID(String address) {
-        String GET_ADDRESS_ID_QUERY = String.format("SELECT id FROM mono.addresses " +
-                "WHERE address = '%s';", address);
-
-        UUID result;
-        try (
-                Statement stmt = dbConnection.createStatement(
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
-                        ResultSet.CONCUR_READ_ONLY
-                )
-        ) {
-            ResultSet rs = stmt.executeQuery(GET_ADDRESS_ID_QUERY);
-            rs.last();
-            if (rs.getRow() == 1) {
-                result = rs.getObject("id", java.util.UUID.class);
-            } else {
-                throw new SQLException("ResultSet contains more than the only one record!\n" +
-                        "CHeck source data.");
+    public List<Address> getAllAddresses() throws SQLAddressRepositoryException {
+        List<Address> result = new ArrayList<>();
+        String GET_ALL_ADDRESSES_QUERY = "SELECT * FROM mono.addresses";
+        try (PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_ALL_ADDRESSES_QUERY)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                UUID addressID = resultSet.getObject("id", java.util.UUID.class);
+                String addr = resultSet.getString("address");
+                String userEmail = resultSet.getString("user_email");
+                Address address = new Address(addressID, addr, userEmail);
+                result.add(address);
             }
-
         } catch (SQLException e) {
-            e.printStackTrace();
-            result = null;
+            throw new SQLAddressRepositoryException("Can't execute: ", e);
         }
         return result;
     }
 
     @Override
-    public void addAddress(Address paymentAddress) {
+    public UUID getAddressID(String address) throws SQLAddressRepositoryException {
+        String GET_ADDRESS_ID_QUERY = "SELECT id FROM mono.addresses WHERE address = ?";
+
+        try (PreparedStatement preparedStatement = dbConnection.prepareStatement(GET_ADDRESS_ID_QUERY,
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY)) {
+            int pos = 0;
+            preparedStatement.setString(++pos, address);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            return resultSet.getObject("id", java.util.UUID.class);
+
+        } catch (SQLException e) {
+            throw new SQLAddressRepositoryException("Can't execute. ", e);
+        }
+    }
+
+    @Override
+    public void addAddress(Address paymentAddress) throws SQLAddressRepositoryException {
         long start = System.nanoTime();
         String user_email = paymentAddress.getUserEmail();
         String address = paymentAddress.getAddress();
@@ -68,7 +81,7 @@ public class SqlAddressRepository implements AddressRepository {
             preparedStatement.execute();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLAddressRepositoryException("Can't execute. ", e);
         }
         long end = System.nanoTime();
         String report = String.format("Payment address added:%n" +
@@ -79,5 +92,19 @@ public class SqlAddressRepository implements AddressRepository {
                 paymentAddress.getAddress(),
                 paymentAddress.getUserEmail());
         logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
+    }
+
+    public static class SQLAddressRepositoryException extends Exception {
+        public SQLAddressRepositoryException() {
+            super();
+        }
+
+        public SQLAddressRepositoryException(String message) {
+            super(message);
+        }
+
+        public SQLAddressRepositoryException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }

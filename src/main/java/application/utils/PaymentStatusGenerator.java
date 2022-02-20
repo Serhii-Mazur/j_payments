@@ -4,12 +4,8 @@ import application.constants.PaymentStatus;
 import application.domain.Payment;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
-import java.util.UUID;
-
-import static java.time.temporal.ChronoUnit.SECONDS;
 
 public class PaymentStatusGenerator {
     private final Random random;

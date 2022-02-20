@@ -5,7 +5,6 @@ import application.port.PaymentRepository;
 import application.port.TemplateRepository;
 import application.port.UserRepository;
 import application.service.PaymentExecutor;
-import com.sun.tools.javac.Main;
 import dal.*;
 
 import java.io.File;
@@ -20,10 +19,8 @@ import java.util.logging.Logger;
 public class ContextContainer {
     private static ContextContainer instance;
 
-    private final Logger logger;
     private final Connection connection;
     private final File inputFile;
-    private final File outputFile;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final TemplateRepository templateRepository;
@@ -31,16 +28,7 @@ public class ContextContainer {
     private final PaymentExecutor paymentExecutor;
     private final PaymentStatusGenerator psGenerator;
 
-    private final String srcDirPath = Path.of(
-            System.getProperty("user.dir"),
-            "src\\main\\resources").toAbsolutePath().toString();
-    private static final String dstDirPath = Path.of(
-            System.getProperty("user.dir"),
-            "src\\main\\output").toAbsolutePath().toString();
-
-    private ContextContainer(Logger logger,
-                             File inputFile,
-                             File outputFile,
+    private ContextContainer(File inputFile,
                              Connection connection,
                              UserRepository userRepository,
                              AddressRepository addressRepository,
@@ -48,9 +36,7 @@ public class ContextContainer {
                              PaymentRepository paymentRepository,
                              PaymentExecutor paymentExecutor,
                              PaymentStatusGenerator psGenerator) {
-        this.logger = logger;
         this.inputFile = inputFile;
-        this.outputFile = outputFile;
         this.connection = connection;
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
@@ -60,19 +46,17 @@ public class ContextContainer {
         this.psGenerator = psGenerator;
     }
 
-    public static ContextContainer init(Logger logger, String srcDirPath, String dstDirPath, String configFileName) throws ContextContainerException {
+    public static ContextContainer init(Logger logger, String srcDirPath, String configFileName) throws ContextContainerException {
         if (instance == null) {
             Properties properties = new Properties();
             try {
                 properties.load(Files.newBufferedReader(Path.of(srcDirPath, configFileName).toAbsolutePath()));
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new ContextContainerException("Can't open file. ", e);
             }
             String inputFilePath = Path.of(srcDirPath, properties.getProperty("input_file_name")).toAbsolutePath().toString();
-            String outputFilePath = Path.of(dstDirPath, properties.getProperty("output_file_name")).toAbsolutePath().toString();
             String dbConfigFilePath = Path.of(srcDirPath, properties.getProperty("dbconfig_file_name")).toAbsolutePath().toString();
             File inputFile;
-            File outputFile;
             Connection connection;
             UserRepository userRepository;
             AddressRepository addressRepository;
@@ -82,7 +66,6 @@ public class ContextContainer {
             PaymentStatusGenerator psGenerator;
             try {
                 inputFile = createInputFile(inputFilePath);
-                outputFile = createOutputFile(outputFilePath);
                 connection = createConnection(dbConfigFilePath);
                 userRepository = createUserRepository(logger, connection);
                 addressRepository = createAddressRepository(logger, connection);
@@ -91,12 +74,10 @@ public class ContextContainer {
                 psGenerator = createPaymentStatusGenerator();
                 paymentExecutor = createPaymentExecutor(logger, paymentRepository, psGenerator);
             } catch (ContextContainerException e) {
-                throw e;
+                throw new ContextContainerException("Can't create context. ", e);
             }
             instance = new ContextContainer(
-                    logger,
                     inputFile,
-                    outputFile,
                     connection,
                     userRepository,
                     addressRepository,
@@ -104,18 +85,12 @@ public class ContextContainer {
                     paymentRepository,
                     paymentExecutor,
                     psGenerator);
-        } else {
-
         }
         return instance;
     }
 
     public File getInputFile() {
         return inputFile;
-    }
-
-    public File getOutputFile() {
-        return outputFile;
     }
 
     public Connection getConnection() {
@@ -154,30 +129,11 @@ public class ContextContainer {
         return inputFile;
     }
 
-    private static File createOutputFile(String outputFilePath) throws ContextContainerException {
-        String dstDirPath = outputFilePath.substring(0, outputFilePath.lastIndexOf('\\'));
-        File dstDir = new File(dstDirPath);
-        if (dstDir.exists()) {
-            if (!dstDir.isDirectory()) {
-                throw new ContextContainerException(String.format("Can't create directory %s!", dstDir.getAbsolutePath()));
-            }
-        } else {
-            dstDir.mkdirs();
-        }
-        File outputFile = new File(outputFilePath);
-        try {
-            outputFile.createNewFile();
-        } catch (IOException e) {
-            throw new ContextContainerException(String.format("Can't create file %s", outputFile.getAbsolutePath()), e);
-        }
-        return outputFile;
-    }
+
 
     private static Connection createConnection(String dbConfigFilePath) throws ContextContainerException {
-        Connection connection = null;
-//        String configFilePath = Path.of(srcDirPath, properties.getProperty("dbconfig_file_name")).toAbsolutePath().toString();
+        Connection connection;
         try {
-//            connection = DatabaseConnector.getDbConnection(DatabaseConfig.init(dbConfigFilePath));
             connection = DatabaseConnector.getPooledConnection(DatabaseConfig.init(dbConfigFilePath));
         } catch (DatabaseConfig.ConfigDBException
                 | ClassNotFoundException

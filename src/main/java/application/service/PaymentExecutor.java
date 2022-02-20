@@ -4,7 +4,9 @@ import application.constants.PaymentStatus;
 import application.domain.Payment;
 import application.port.PaymentRepository;
 import application.utils.PaymentStatusGenerator;
+import dal.SqlPaymentRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -22,30 +24,35 @@ public class PaymentExecutor implements Runnable {
 
     @Override
     public void run() {
-        logger.info("Payment Executor run!");
-        List<Payment> newPayments;
+        List<Payment> newPayments = new ArrayList<>();
         int counter = 0;
         while (true) {
-
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             long start = System.nanoTime();
-            newPayments = paymentRepository.getPaymentsByStatus(PaymentStatus.NEW);
+            try {
+                newPayments = paymentRepository.getPaymentsByStatus(PaymentStatus.NEW);
+            } catch (SqlPaymentRepository.SQLPaymentRepositoryExcception e) {
+                e.printStackTrace();
+            }
             if (newPayments.size() == 0) {
                 counter++;
             }
-            if (counter > 10) {
+            if (counter > 5) {
                 break;
             }
             for (Payment payment : newPayments) {
-                System.out.println(payment.getPaymentID().toString() + " -> " + payment.getPaymentStatus().name());
                 PaymentStatus newStatus = psGenerator.getNewStatus(payment);
                 if (!newStatus.equals(PaymentStatus.NEW)) {
                     payment.setPaymentStatus(newStatus);
-                    paymentRepository.updatePaymentStatus(payment.getPaymentID(), newStatus);
+                    try {
+                        paymentRepository.updatePaymentStatus(payment.getPaymentID(), newStatus);
+                    } catch (SqlPaymentRepository.SQLPaymentRepositoryExcception e) {
+                        e.printStackTrace();
+                    }
                     long end = System.nanoTime();
                     String report = String.format("Update status of payment %n" +
                                     "Payment ID     : %s%n" +
@@ -63,30 +70,9 @@ public class PaymentExecutor implements Runnable {
                             payment.getCreatedDateTime(),
                             payment.getEtlDateTime());
                     logger.info(report + "Operation time: " + ((end - start) / 1000) + " milliseconds.");
-//                    logger.info(payment.getPaymentID().toString() + " has got final status! Operation time: " + ((end - start) / 1000) + " milliseconds.");
-//                    System.out.println(payment.getPaymentID().toString() + " has got new status! Operation time: " + (end - start) + " nanoseconds.");
                 }
             }
 
         }
-
-//        do {
-//            try {
-//                TimeUnit.SECONDS.sleep(1);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            newPayments = paymentRepository.getPaymentsByStatus(PaymentStatus.NEW);
-//            for (Payment payment : newPayments) {
-//                System.out.println(payment.getPaymentID().toString() + " -> " + payment.getPaymentStatus().name());
-//                PaymentStatus newStatus = psGenerator.getNewStatus(payment);
-//                if (!newStatus.equals(PaymentStatus.NEW)) {
-//                    paymentRepository.updatePaymentStatus(payment.getPaymentID(), newStatus);
-//                    System.out.println(payment.getPaymentID().toString() + " has got new status!");
-//                }
-//            }
-//        } while (newPayments.size() > 0);
-
-//        System.out.println("All payments have got new status!");
     }
 }

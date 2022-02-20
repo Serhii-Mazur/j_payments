@@ -1,6 +1,5 @@
 package application.domain;
 
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -13,6 +12,12 @@ public class Address {
         this.address = address;
         this.userEmail = userEmail;
         this.addressID = UUID.randomUUID();
+    }
+
+    public Address(UUID addressID, String address, String userEmail) {
+        this.addressID = addressID;
+        this.address = address;
+        this.userEmail = userEmail;
     }
 
     @Override

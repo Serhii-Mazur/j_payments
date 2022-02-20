@@ -7,21 +7,18 @@ import java.util.Properties;
 
 public class DatabaseConfig {
     private final String configFilePath;
-//    private final Properties DB_PROPERTIES = new Properties();
     private final String dbType;
     private final String dbHost;
-//    private final int port;
     private final String dbSchema;
     private final String user;
     private final String password;
     private final String url;
     private static DatabaseConfig instance;
 
-    public DatabaseConfig(String configFilePath, String dbType, String dbHost, /*int port,*/ String dbSchema, String user, String password, String url) {
+    public DatabaseConfig(String configFilePath, String dbType, String dbHost, String dbSchema, String user, String password, String url) {
         this.configFilePath = configFilePath;
         this.dbType = dbType;
         this.dbHost = dbHost;
-//        this.port = port;
         this.dbSchema = dbSchema;
         this.user = user;
         this.password = password;
@@ -38,7 +35,6 @@ public class DatabaseConfig {
             }
             String dbType = DB_PROPERTIES.getProperty("dbtype");
             String dbHost = DB_PROPERTIES.getProperty("dbhost");
-//            int dbPort = Integer.parseInt(DB_PROPERTIES.getProperty("dbport"));
             String dbPort = DB_PROPERTIES.getProperty("dbport");
             String dbSchema = DB_PROPERTIES.getProperty("dbschema");
             String user = DB_PROPERTIES.getProperty("user");
@@ -49,20 +45,14 @@ public class DatabaseConfig {
                             dbHost + ":" +
                             dbPort + "/" +
                             dbName;
-            instance = new DatabaseConfig(configFilePath, dbType, dbHost, /*dbPort, */dbSchema, user, password, url);
+            instance = new DatabaseConfig(configFilePath, dbType, dbHost, dbSchema, user, password, url);
         }
-
-
         return instance;
     }
 
     public String getDbType() {
         return dbType;
     }
-
-//    public int getPort() {
-//        return port;
-//    }
 
     public String getDbSchema() {
         return dbSchema;
@@ -78,6 +68,14 @@ public class DatabaseConfig {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getConfigFilePath() {
+        return configFilePath;
+    }
+
+    public String getDbHost() {
+        return dbHost;
     }
 
     public static class ConfigDBException extends Exception {

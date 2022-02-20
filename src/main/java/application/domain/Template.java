@@ -1,6 +1,5 @@
 package application.domain;
 
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,12 +10,16 @@ public class Template {
     private String templateName;
     private String iban;
 
-    public Template(UUID addressID, String templateName, String paymentPurpose, String iban) {
+    public Template(UUID templateID, UUID addressID, String templateName, String paymentPurpose, String iban) {
+        this.templateID = templateID;
         this.addressID = addressID;
         this.templateName = templateName;
         this.paymentPurpose = paymentPurpose;
         this.iban = iban;
-        this.templateID = UUID.randomUUID();
+    }
+
+    public Template(UUID addressID, String templateName, String paymentPurpose, String iban) {
+        this(UUID.randomUUID(), addressID, templateName, paymentPurpose, iban);
     }
 
     @Override
